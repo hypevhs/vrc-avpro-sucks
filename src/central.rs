@@ -2,7 +2,11 @@ use std::sync::mpsc::{self, Receiver, Sender};
 
 use chrono::{DateTime, Local};
 
-use crate::{log_debug, mpv_commander::{mpv_load_url, mpv_seek, MpvIpcRequest, MpvIpcResponse}, vrc_log_reader::{FoundSeek, UrlAndSeekResult, VrcLogReader, VrcLogWatcherEvent}};
+use crate::{
+    log_debug,
+    mpv_commander::{mpv_load_url, mpv_seek, MpvIpcRequest, MpvIpcResponse},
+    vrc_log_reader::{FoundSeek, UrlAndSeekResult, VrcLogReader, VrcLogWatcherEvent},
+};
 
 pub(crate) enum CentralCommand {
     MpvIpcEvent(MpvIpcResponse),
