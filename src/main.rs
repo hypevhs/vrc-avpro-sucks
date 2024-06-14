@@ -9,14 +9,15 @@ use vrc_log_reader::{VrcLogWatcher, VrcLogWatcherEvent};
 use mpv_commander::start_mpv;
 
 use crate::{
-    central::Central, mpv_commander::{spawn_mpv_ipc_threads, MpvIpcRequest}
+    central::Central,
+    mpv_commander::{spawn_mpv_ipc_threads, MpvIpcRequest},
 };
 
+mod central;
 mod common;
 mod mpv_commander;
 mod vrc_log_reader;
 mod vrc_log_reader_tests;
-mod central;
 
 // TODO: join and unwrap all threads
 
