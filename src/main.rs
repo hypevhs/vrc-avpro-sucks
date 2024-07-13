@@ -76,23 +76,45 @@ fn process_args() -> MainOptions {
     args.next(); // skip argv[0]
 
     while let Some(arg) = args.next() {
-        if arg == "--player-name-regex" {
-            if let Some(player_name_regex) = args.next() {
-                let player_name_regex = Regex::new(&player_name_regex)
-                    .expect("Invalid regex value for player-name-regex");
-                log_debug!(
-                    "Filtering log processing to only video players that match the regex: {}",
-                    player_name_regex
-                );
-                main_options.player_name_regex = Some(player_name_regex);
-            } else {
-                log_debug!("Usage: vrc-avpro-sucks [--player-name-regex <player_name_regex>]");
+        match arg.as_str() {
+            "--player-name-regex" => {
+                if let Some(player_name_regex) = args.next() {
+                    let player_name_regex = Regex::new(&player_name_regex);
+                    match player_name_regex {
+                        Ok(player_name_regex) => {
+                            log_debug!(
+                                "Filtering log processing to only video players that match the regex: {}",
+                                player_name_regex
+                            );
+                            main_options.player_name_regex = Some(player_name_regex);
+                        }
+                        Err(e) => {
+                            log_debug!("Invalid regex value for player-name-regex: {}", e);
+                            print_usage();
+                            std::process::exit(1);
+                        }
+                    }
+                } else {
+                    print_usage();
+                    std::process::exit(1);
+                }
+            }
+            "--help" => {
+                print_usage();
+                std::process::exit(0);
+            }
+            _ => {
+                log_debug!("Unknown argument: {}", arg);
+                print_usage();
                 std::process::exit(1);
             }
         }
     }
-
     main_options
+}
+
+fn print_usage() {
+    log_debug!("Usage: vrc-avpro-sucks [--player-name-regex <player_name_regex>] [--help]");
 }
 
 fn spawn_log_watcher_thread(
