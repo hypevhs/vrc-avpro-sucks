@@ -46,6 +46,15 @@ impl Central {
         let initial_state_result = read_initial_state_from_log();
 
         if let Some(initial_state) = initial_state_result.initial_state {
+            log_debug!("Initial state found.");
+            log_debug!("Timestamp: {}", initial_state.timestamp);
+            log_debug!("Additional offset: {}", initial_state.additional_offset);
+            log_debug!("Given that right now is {}", chrono::Local::now());
+            log_debug!(
+                "We should seek to {}",
+                calculate_seek_from_initial_state(&initial_state)
+            );
+
             mpv_load_url(self.mpv_ipc_tx.clone(), &initial_state.url);
             self.mid_loading_initial_state = Some(initial_state);
         }
@@ -82,9 +91,7 @@ fn timestamp_from_seek_line(found_seek: &FoundSeek) -> f64 {
     let now = chrono::Local::now();
     let duration = now.signed_duration_since(found_seek.timestamp);
     // add this duration to the seek offset, which has also been returned from the log file
-    let new_seek_offset = found_seek.seek_offset
-        + duration.num_seconds() as f64
-        + duration.num_milliseconds() as f64 / 1000.0;
+    let new_seek_offset = found_seek.seek_offset + duration.num_milliseconds() as f64 / 1000.0;
 
     new_seek_offset
 }
@@ -95,9 +102,8 @@ fn calculate_seek_from_initial_state(initial_state: &InitialState) -> f64 {
     let now = chrono::Local::now();
     let duration = now.signed_duration_since(initial_state.timestamp);
     // add this duration to the seek offset, which may have also been returned from the log file
-    let new_seek_offset = initial_state.additional_offset
-        + duration.num_seconds() as f64
-        + duration.num_milliseconds() as f64 / 1000.0;
+    let new_seek_offset =
+        initial_state.additional_offset + duration.num_milliseconds() as f64 / 1000.0;
 
     new_seek_offset
 }
