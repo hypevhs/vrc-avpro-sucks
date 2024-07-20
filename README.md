@@ -8,10 +8,11 @@ to `mpv` in order to keep the video synced with what you'd expect to see ingame.
 
 #### Done, needs testing
 
-#### To Do
-
 - Prevent seeking (i.e. via a seek line) before the video is fully loaded
 - Joining a world where the ingame player has already ended shouldn't replay the video from the beginning
+
+#### To Do
+
 - Add controls (terminal and/or mpv keybinds) for e.g. switching ingame player, resyncing, detach state from VRC player
 - Listen to pause and resume events from log
 - Prevent overzealous seeks
