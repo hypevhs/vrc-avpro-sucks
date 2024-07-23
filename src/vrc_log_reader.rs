@@ -155,19 +155,24 @@ A recap.
 
 2024.06.06 17:22:14 Log        -  [AVProVideo] Opening https://example.net/video.mp4 (offset 0) with API MediaFoundation
 -- This might be a good option, but it likely doesn't capture usage of the Unity player, which AFAICT also needs fixing.
+
+Other examples.
+ProTV 3.0.0-beta.18:
+2024.06.06 17:22:14 Log        -  [AT INFO    	TVManager (Theatre 1 TVManager)] [VideoManager_Theatre1] (Some Username) Now Playing: https://example.net/video.mp4
+ProTV v2.3.14:
+2024.07.22 17:48:43 Log        -  [ATA | TVManagerV2 (ProTV Hangout (1))] [AVPro1080p] Now Playing: https://youtu.be/zL3wWykAKfs
 */
 pub(crate) static URL_REGEX: Lazy<Regex> = lazy_regex!(
-    // r"^(?P<timestamp>[0-9.: ]+) Log +- +\[Video Playback\] Attempting to resolve URL '(?P<url>https?://\S+)'"
-    r"^(?P<timestamp>[0-9.: ]+) Log +- +\[AT INFO[ \t]+TVManager \((?P<player_name>.*)\)\] \[.*\] \([^()]*\) Now Playing: (?P<url>https?://\S+)"
+    r"^(?P<timestamp>[0-9.: ]+) Log +- +\[ATA? (?:INFO|DEBUG|\|)[ \t]+TVManager(?:V2)? \((?P<player_name>.*)\)\] \[.*\] (\([^()]*\) )?Now Playing: (?P<url>https?://\S+)"
 );
 
 // this is specifically for ProTV.
 // 2024.04.22 17:55:53 Log        -  [AT INFO    	TVManager (Theatre 1 TVManager)] Sync enforcement. Updating to 116.47
+// 2024.07.22 17:48:44 Log        -  [ATA | TVManagerV2 (ProTV Hangout (1))] Sync enforcement requested. Updating to 44.96499
 // 2024.05.09 19:11:19 Log        -  [AT DEBUG 	TVManager (Theatre 1 TVManager)] Paused drift threshold exceeded. Updating to 64.8041
 // 2024.06.03 18:03:02 Log        -  [AT DEBUG 	TVManager (Theatre 3 TVManager)] Jumping [VideoManager_Theatre3] to timestamp: 171.1321
 pub(crate) static SEEK_REGEX: Lazy<Regex> = lazy_regex!(
-    // r"^(?P<timestamp>[0-9.: ]+) Log +- +\[AT (INFO|DEBUG)[ \t]+TVManager \(.*\)\] (Sync enforcement|Paused drift threshold exceeded). Updating to (?P<new_offset>[0-9.]+)$"
-    r"^(?P<timestamp>[0-9.: ]+) Log +- +\[AT (INFO|DEBUG)[ \t]+TVManager \((?P<player_name>.*)\)\] (((Sync enforcement|Paused drift threshold exceeded). Updating to)|Jumping \[.*\] to timestamp:) (?P<new_offset>[0-9.]+)$"
+    r"^(?P<timestamp>[0-9.: ]+) Log +- +\[ATA? (?:INFO|DEBUG|\|)[ \t]+TVManager(?:V2)? \((?P<player_name>.*)\)\] (((Sync enforcement(?: requested)?|Paused drift threshold exceeded). Updating to)|Jumping \[.*\] to timestamp:) (?P<new_offset>[0-9.]+)$"
 );
 
 fn tail_file<FCallback>(
