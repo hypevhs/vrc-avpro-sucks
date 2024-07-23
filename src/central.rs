@@ -83,8 +83,13 @@ impl Central {
     pub(crate) fn run_central_dispatch(mut self) {
         for response in self.central_rx {
             match response {
-                CentralCommand::MpvIpcEvent(MpvIpcResponse::PlaybackRestart) => {}
                 CentralCommand::MpvIpcEvent(MpvIpcResponse::FileLoaded) => {
+                    // We're technically allowed to start seeking as soon as the FileLoaded event, which happens earlier
+                    // in the cycle than PlaybackRestart. But by the time MPV starts playback, which could be several
+                    // seconds, our target_timestamp will become stale.
+                    // So let's wait until MPV is actually rolling.
+                }
+                CentralCommand::MpvIpcEvent(MpvIpcResponse::PlaybackRestart) => {
                     if let Some(state) = self.mid_loading_state {
                         self.mid_loading_state = None;
                         // We were waiting on MPV to load the file. We're finally allowed to seek.
